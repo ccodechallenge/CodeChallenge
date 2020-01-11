@@ -8,12 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -30,7 +30,7 @@ public class DeviceServiceTest {
 
     @Test
     public void should_PutDeviceOperationResultCorrect() {
-        Device mockDevice = Mockito.mock(Device.class);
+        Device mockDevice = mock(Device.class);
         when(mockDevice.getId()).thenReturn(1L);
         when(mockRepository.save(any())).thenReturn(mockDevice);
 
@@ -38,5 +38,4 @@ public class DeviceServiceTest {
 
         assertThat(response.getId(), greaterThan(0L));
     }
-
 }
