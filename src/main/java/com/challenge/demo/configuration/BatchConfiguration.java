@@ -1,5 +1,6 @@
 package com.challenge.demo.configuration;
 
+import com.challenge.demo.Constants;
 import com.challenge.demo.repository.entity.Device;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -24,6 +25,10 @@ import javax.sql.DataSource;
 @EnableBatchProcessing
 public class BatchConfiguration {
 
+    private static final String READER_NAME = "deviceItemReader";
+    private static final String STEP_NAME = "step1";
+    private static final String JOB_NAME = "importDeviceJob";
+
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
 
@@ -34,8 +39,8 @@ public class BatchConfiguration {
     public JsonItemReader<Device> reader() {
         return new JsonItemReaderBuilder<Device>()
                 .jsonObjectReader(new JacksonJsonObjectReader<>(Device.class))
-                .resource(new ClassPathResource("devices.json"))
-                .name("deviceItemReader")
+                .resource(new ClassPathResource(Constants.FILE_DEVICES))
+                .name(READER_NAME)
                 .build();
     }
 
@@ -50,7 +55,7 @@ public class BatchConfiguration {
 
     @Bean
     public Step step(JdbcBatchItemWriter<Device> writer) {
-        return stepBuilderFactory.get("step1")
+        return stepBuilderFactory.get(STEP_NAME)
                 .<Device, Device> chunk(7)
                 .reader(reader())
                 .writer(writer)
@@ -59,7 +64,7 @@ public class BatchConfiguration {
 
     @Bean
     public Job importJob(Step step1) {
-        return jobBuilderFactory.get("importDeviceJob")
+        return jobBuilderFactory.get(JOB_NAME)
                 .incrementer(new RunIdIncrementer())
                 .flow(step1)
                 .end()
