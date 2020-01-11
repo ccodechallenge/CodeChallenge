@@ -35,7 +35,7 @@ public class RestAPIExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
-    private Error toError(Exception ex) {
+    Error toError(Exception ex) {
         StringBuilder messageBuilder = new StringBuilder();
 
         consumers.stream()
