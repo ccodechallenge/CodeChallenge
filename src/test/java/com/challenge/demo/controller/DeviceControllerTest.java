@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
 /**
@@ -32,7 +33,6 @@ public class DeviceControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String PATH_FORMAT = "http://localhost:%d/";
     private static final String API_EXT_ADD_DEVICE = "device";
     private static final String API_EXT_LIST_DEVICE = "devices";
 
@@ -100,5 +100,37 @@ public class DeviceControllerTest {
         List<DeviceResponse> devices = ((List<DeviceResponse>) response.getBody());
 
         assertThat(devices.size(), greaterThan(0));
+    }
+
+    @Test
+    public void should_FilteringRecentlyAddedDeviceCorrect() throws URISyntaxException {
+        final String putPath = PathBuilder.newBuilder(port)
+                .addApiExtension(API_EXT_ADD_DEVICE)
+                .build();
+
+        DeviceRequest data = DeviceRequest.builder()
+                .brand("testBrand")
+                .model("testModel")
+                .os("iOS")
+                .osVersion("1.1.0-alpha")
+                .build();
+
+        HttpEntity<DeviceRequest> request = new HttpEntity<>(data);
+
+        restTemplate.exchange(putPath, HttpMethod.PUT, request, DeviceResponse.class);
+
+        final String listPath = PathBuilder.newBuilder(port)
+                .addApiExtension(API_EXT_LIST_DEVICE)
+                .addQueryParam(Pair.of("brand", "testBrand"))
+                .addQueryParam(Pair.of("model", "testModel"))
+                .addQueryParam(Pair.of("osVersion", "1.1.0-alpha"))
+                .build();
+
+        ResponseEntity<Object> response = restTemplate.exchange(listPath,
+                HttpMethod.GET, null, Object.class);
+
+        List<DeviceResponse> devices = ((List<DeviceResponse>) response.getBody());
+
+        assertThat(devices.size(), equalTo(1));
     }
 }
