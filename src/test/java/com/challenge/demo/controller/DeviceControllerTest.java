@@ -2,15 +2,18 @@ package com.challenge.demo.controller;
 
 import com.challenge.demo.service.entity.DeviceRequest;
 import com.challenge.demo.service.entity.DeviceResponse;
+import com.challenge.demo.util.PathBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,8 +32,16 @@ public class DeviceControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    private static final String PATH_FORMAT = "http://localhost:%d/";
+    private static final String API_EXT_ADD_DEVICE = "device";
+    private static final String API_EXT_LIST_DEVICE = "devices";
+
     @Test
     public void should_PutDeviceCorrect() {
+        final String path = PathBuilder.newBuilder(port)
+                .addApiExtension(API_EXT_ADD_DEVICE)
+                .build();
+
         DeviceRequest data = DeviceRequest.builder()
                 .brand("brand")
                 .model("model")
@@ -39,7 +50,7 @@ public class DeviceControllerTest {
                 .build();
 
         HttpEntity<DeviceRequest> request = new HttpEntity<>(data);
-        String path = "http://localhost:" + port + "/device";
+
         ResponseEntity<DeviceResponse> response = restTemplate.exchange(path,
                 HttpMethod.PUT, request, DeviceResponse.class);
 
@@ -48,7 +59,10 @@ public class DeviceControllerTest {
 
     @Test
     public void should_GetDeviceListCorrect() {
-        String path = "http://localhost:" + port + "/devices";
+        final String path = PathBuilder.newBuilder(port)
+                .addApiExtension(API_EXT_LIST_DEVICE)
+                .build();
+
         ResponseEntity<Object> response = restTemplate.exchange(path,
                 HttpMethod.GET, null, Object.class);
 
@@ -58,8 +72,12 @@ public class DeviceControllerTest {
     }
 
     @Test
-    public void should_GetSingleFilteredDeviceListCorrect() {
-        String path = "http://localhost:" + port + "/devices" + "?" + "brand=" + "Samsung";
+    public void should_GetSingleFilteredDeviceListCorrect() throws URISyntaxException {
+        final String path = PathBuilder.newBuilder(port)
+                .addApiExtension(API_EXT_LIST_DEVICE)
+                .addQueryParam(Pair.of("brand", "Samsung"))
+                .build();
+
         ResponseEntity<Object> response = restTemplate.exchange(path,
                 HttpMethod.GET, null, Object.class);
 
@@ -69,8 +87,13 @@ public class DeviceControllerTest {
     }
 
     @Test
-    public void should_GetMultipleFilteredDeviceListCorrect() {
-        String path = "http://localhost:" + port + "/devices" + "?" + "brand=" + "Samsung" + "&os=" + "Android";
+    public void should_GetMultipleFilteredDeviceListCorrect() throws URISyntaxException {
+        final String path = PathBuilder.newBuilder(port)
+                .addApiExtension(API_EXT_LIST_DEVICE)
+                .addQueryParam(Pair.of("brand", "Samsung"))
+                .addQueryParam(Pair.of("os", "Android"))
+                .build();
+
         ResponseEntity<Object> response = restTemplate.exchange(path,
                 HttpMethod.GET, null, Object.class);
 
