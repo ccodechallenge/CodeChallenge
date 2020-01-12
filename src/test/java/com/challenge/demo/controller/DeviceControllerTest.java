@@ -2,6 +2,7 @@ package com.challenge.demo.controller;
 
 import com.challenge.demo.service.entity.DeviceRequest;
 import com.challenge.demo.service.entity.DeviceResponse;
+import com.challenge.demo.util.ExchangeHelper;
 import com.challenge.demo.util.PathBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.util.Pair;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.challenge.demo.util.DeviceRequestCreator.newDeviceRequest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -42,19 +41,10 @@ public class DeviceControllerTest {
                 .addApiExtension(API_EXT_ADD_DEVICE)
                 .build();
 
-        DeviceRequest data = DeviceRequest.builder()
-                .brand("brand")
-                .model("model")
-                .os("iOS")
-                .osVersion("1.1.0-alpha")
-                .build();
+        DeviceResponse response = ExchangeHelper.with(restTemplate)
+                .putDevice(path, newDeviceRequest("put"));
 
-        HttpEntity<DeviceRequest> request = new HttpEntity<>(data);
-
-        ResponseEntity<DeviceResponse> response = restTemplate.exchange(path,
-                HttpMethod.PUT, request, DeviceResponse.class);
-
-        assertThat(response.getBody().getId(), greaterThan(0L));
+        assertThat(response.getId(), greaterThan(0L));
     }
 
     @Test
@@ -63,10 +53,8 @@ public class DeviceControllerTest {
                 .addApiExtension(API_EXT_LIST_DEVICE)
                 .build();
 
-        ResponseEntity<Object> response = restTemplate.exchange(path,
-                HttpMethod.GET, null, Object.class);
-
-        List<DeviceResponse> devices = ((List<DeviceResponse>) response.getBody());
+        List<DeviceResponse> devices = ExchangeHelper.with(restTemplate)
+                .getDevices(path);
 
         assertThat(devices.size(), greaterThan(0));
     }
@@ -78,10 +66,8 @@ public class DeviceControllerTest {
                 .addQueryParam(Pair.of("brand", "Samsung"))
                 .build();
 
-        ResponseEntity<Object> response = restTemplate.exchange(path,
-                HttpMethod.GET, null, Object.class);
-
-        List<DeviceResponse> devices = ((List<DeviceResponse>) response.getBody());
+        List<DeviceResponse> devices = ExchangeHelper.with(restTemplate)
+                .getDevices(path);
 
         assertThat(devices.size(), greaterThan(0));
     }
@@ -94,10 +80,8 @@ public class DeviceControllerTest {
                 .addQueryParam(Pair.of("os", "Android"))
                 .build();
 
-        ResponseEntity<Object> response = restTemplate.exchange(path,
-                HttpMethod.GET, null, Object.class);
-
-        List<DeviceResponse> devices = ((List<DeviceResponse>) response.getBody());
+        List<DeviceResponse> devices = ExchangeHelper.with(restTemplate)
+                .getDevices(path);
 
         assertThat(devices.size(), greaterThan(0));
     }
@@ -108,28 +92,20 @@ public class DeviceControllerTest {
                 .addApiExtension(API_EXT_ADD_DEVICE)
                 .build();
 
-        DeviceRequest data = DeviceRequest.builder()
-                .brand("testBrand")
-                .model("testModel")
-                .os("iOS")
-                .osVersion("1.1.0-alpha")
-                .build();
+        DeviceRequest deviceRequest = newDeviceRequest("get");
 
-        HttpEntity<DeviceRequest> request = new HttpEntity<>(data);
-
-        restTemplate.exchange(putPath, HttpMethod.PUT, request, DeviceResponse.class);
+        ExchangeHelper.with(restTemplate)
+                .putDevice(putPath, deviceRequest);
 
         final String listPath = PathBuilder.newBuilder(port)
                 .addApiExtension(API_EXT_LIST_DEVICE)
-                .addQueryParam(Pair.of("brand", "testBrand"))
-                .addQueryParam(Pair.of("model", "testModel"))
-                .addQueryParam(Pair.of("osVersion", "1.1.0-alpha"))
+                .addQueryParam(Pair.of("brand", deviceRequest.getBrand()))
+                .addQueryParam(Pair.of("model", deviceRequest.getModel()))
+                .addQueryParam(Pair.of("osVersion", deviceRequest.getOsVersion()))
                 .build();
 
-        ResponseEntity<Object> response = restTemplate.exchange(listPath,
-                HttpMethod.GET, null, Object.class);
-
-        List<DeviceResponse> devices = ((List<DeviceResponse>) response.getBody());
+        List<DeviceResponse> devices = ExchangeHelper.with(restTemplate)
+                .getDevices(listPath);
 
         assertThat(devices.size(), equalTo(1));
     }
