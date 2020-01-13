@@ -1,6 +1,6 @@
 package com.challenge.demo.repository.entity;
 
-import com.challenge.demo.validator.OSConstraint;
+import com.challenge.demo.repository.validator.OSConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

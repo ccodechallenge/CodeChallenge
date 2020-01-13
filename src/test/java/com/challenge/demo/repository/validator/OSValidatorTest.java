@@ -1,4 +1,4 @@
-package com.challenge.demo.validator;
+package com.challenge.demo.repository.validator;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

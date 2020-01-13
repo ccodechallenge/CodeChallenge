@@ -1,4 +1,4 @@
-package com.challenge.demo.validator;
+package com.challenge.demo.repository.validator;
 
 import com.challenge.demo.Constants;
 
