@@ -2,6 +2,7 @@ package com.challenge.demo.service.specification;
 
 import com.challenge.demo.repository.entity.Device;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.util.Pair;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -19,18 +20,16 @@ public final class DeviceSpecification implements Specification<Device> {
     private DeviceSpecification(Device device) {
         attributes = new HashMap<>();
 
-        fillOutFromDevice(device);
+        AutoLoader.with(device)
+                .load(this::fillOutFromDevice);
     }
 
     public static DeviceSpecification with(Device device) {
         return new DeviceSpecification(device);
     }
 
-    private void fillOutFromDevice(Device device) {
-        attributes.put("brand", device.getBrand());
-        attributes.put("model", device.getModel());
-        attributes.put("os", device.getOs());
-        attributes.put("osVersion", device.getOsVersion());
+    private void fillOutFromDevice(Pair<String, String> nameValuePair) {
+        attributes.put(nameValuePair.getFirst(), nameValuePair.getSecond());
     }
 
     @Override
