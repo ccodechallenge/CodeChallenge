@@ -28,7 +28,7 @@ public class RestAPIExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleExceptionsGlobally(
             Exception ex, WebRequest request) {
 
-        BaseResponse response = new BaseResponse(false, toError(ex));
+        BaseResponse response = new BaseResponse(toError(ex));
 
         return handleExceptionInternal(ex, response,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);

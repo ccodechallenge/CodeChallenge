@@ -8,10 +8,9 @@ import java.util.stream.Collectors;
 /**
  * Created by nurisezgin on 11.01.2020.
  */
-public class PropertyValidationConsumer implements ExceptionConsumer {
+public final class PropertyValidationConsumer implements ExceptionConsumer {
 
-    private static final String DELIMITER = " ";
-    private String message;
+    public static final String DELIMITER = " ";
 
     @Override
     public String tryToGetMessage(Exception ex) {

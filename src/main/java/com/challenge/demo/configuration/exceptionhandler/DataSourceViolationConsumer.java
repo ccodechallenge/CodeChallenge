@@ -6,7 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 /**
  * Created by nurisezgin on 11.01.2020.
  */
-public class DataSourceViolationConsumer implements ExceptionConsumer {
+public final class DataSourceViolationConsumer implements ExceptionConsumer {
 
     @Override
     public String tryToGetMessage(Exception ex) {

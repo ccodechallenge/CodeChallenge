@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.challenge.demo.configuration.exceptionhandler.PropertyValidationConsumer.DELIMITER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
@@ -57,7 +58,7 @@ public class RestAPIExceptionHandlerTest {
     @Test
     public void should_MultiplePropertyValidationErrorDescriptionCorrect() {
         final String message = "error!";
-        final String expected = message + "\n" + message;
+        final String expected = message + DELIMITER + message;
 
         ConstraintViolation<Object> mockViolation1 = Mockito.mock(ConstraintViolation.class);
         when(mockViolation1.getMessage()).thenReturn(message);
