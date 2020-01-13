@@ -9,11 +9,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 public class DataSourceViolationConsumer implements ExceptionConsumer {
 
     @Override
-    public boolean handle(Exception ex, StringBuilder builder) {
+    public String tryToGetMessage(Exception ex) {
         if (ex instanceof DataIntegrityViolationException) {
-            builder.append(Constants.VALUE_ALREADY_EXIST_ERROR);
-            return true;
+            return Constants.VALUE_ALREADY_EXIST_ERROR;
         }
-        return false;
+
+        return null;
     }
+
 }

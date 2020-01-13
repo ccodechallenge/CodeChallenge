@@ -5,6 +5,6 @@ package com.challenge.demo.configuration.exceptionhandler;
  */
 public interface ExceptionConsumer {
 
-    boolean handle(Exception ex, StringBuilder builder);
+    String tryToGetMessage(Exception ex);
 
 }

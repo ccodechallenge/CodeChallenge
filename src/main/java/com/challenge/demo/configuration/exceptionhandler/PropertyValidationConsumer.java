@@ -10,23 +10,20 @@ import java.util.stream.Collectors;
  */
 public class PropertyValidationConsumer implements ExceptionConsumer {
 
-    private static final String DELIMITER = "\n";
+    private static final String DELIMITER = " ";
+    private String message;
 
     @Override
-    public boolean handle(Exception ex, StringBuilder builder) {
+    public String tryToGetMessage(Exception ex) {
         if (ex instanceof ConstraintViolationException) {
             Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) ex)
                     .getConstraintViolations();
 
-            String message = violations.stream()
+            return violations.stream()
                     .map(v -> v.getMessage())
                     .collect(Collectors.joining(DELIMITER));
-
-            builder.append(message);
-
-            return true;
         }
 
-        return false;
+        return null;
     }
 }

@@ -1,8 +1,8 @@
 package com.challenge.demo.configuration;
 
+import com.challenge.demo.Constants;
 import com.challenge.demo.configuration.exceptionhandler.DataSourceViolationConsumer;
 import com.challenge.demo.configuration.exceptionhandler.ExceptionConsumer;
-import com.challenge.demo.configuration.exceptionhandler.GenericConsumer;
 import com.challenge.demo.configuration.exceptionhandler.PropertyValidationConsumer;
 import com.challenge.demo.service.entity.BaseResponse;
 import com.challenge.demo.service.entity.Error;
@@ -22,8 +22,7 @@ public class RestAPIExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final List<ExceptionConsumer> consumers = Arrays.asList(
             new PropertyValidationConsumer(),
-            new DataSourceViolationConsumer(),
-            new GenericConsumer());
+            new DataSourceViolationConsumer());
 
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> handleExceptionsGlobally(
@@ -36,13 +35,11 @@ public class RestAPIExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     Error toError(Exception ex) {
-        StringBuilder messageBuilder = new StringBuilder();
-
-        consumers.stream()
-                .filter(it -> it.handle(ex, messageBuilder))
-                .findFirst();
-
-        String message = messageBuilder.toString();
+        String message = consumers.stream()
+                .map(it -> it.tryToGetMessage(ex))
+                .filter(it -> it != null)
+                .findFirst()
+                .orElse(Constants.GENERIC_ERROR);
 
         return Error.builder()
                 .description(message)
